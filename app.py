@@ -3,6 +3,9 @@ import groq
 from typing import Optional, Tuple
 import re
 
+# Static Groq API Key
+GROQ_API_KEY = "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"
+
 # Page configuration
 st.set_page_config(
     page_title="Code Explainer App",
@@ -201,35 +204,11 @@ def main():
     with st.sidebar:
         st.header("⚙️ Settings")
         
-        # Initialize session state for API key if not exists
-        if 'api_key' not in st.session_state:
-            st.session_state.api_key = ""
-        
-        api_key = st.text_input(
-            "Groq API Key",
-            value=st.session_state.api_key,
-            type="password",
-            key="groq_api_key_input",
-            help="Enter your Groq API key. Get one at https://console.groq.com/",
-            placeholder="gsk_...",
-            disabled=False
-        )
-        
-        # Update session state when API key changes
-        if api_key != st.session_state.api_key:
-            st.session_state.api_key = api_key
-        
-        st.markdown("---")
-        
         st.markdown("""
         ### 📝 Instructions
-        1. Enter your Groq API key
-        2. Paste your code in the text area
-        3. Optionally select the language
-        4. Click "Explain Code"
-        
-        ### 🔗 Get API Key
-        Visit [Groq Console](https://console.groq.com/) to get your free API key.
+        1. Paste your code in the text area
+        2. Optionally select the language
+        3. Click "Explain Code"
         """)
     
     # Main content area
@@ -285,13 +264,6 @@ def main():
             st.error(f"❌ {code_error}")
             return
         
-        # Use session state API key if available
-        api_key_to_use = st.session_state.get('api_key', api_key)
-        
-        if not validate_api_key(api_key_to_use):
-            st.error("❌ Please enter a valid Groq API key in the sidebar.")
-            return
-        
         # Determine language
         if selected_language == "Auto-detect":
             language = detect_language(code_input)
@@ -302,7 +274,7 @@ def main():
         
         # Show loading spinner
         with st.spinner("🤔 Analyzing your code... This may take 10-15 seconds."):
-            explanation = get_explanation(code_input, language, api_key_to_use)
+            explanation = get_explanation(code_input, language, GROQ_API_KEY)
         
         if explanation:
             st.markdown("---")
